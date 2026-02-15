@@ -647,24 +647,24 @@ ${data.comments || 'Geen opmerkingen'}
 
             const whatsappUrl = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
             
-            // 2. Stuur naar Google Sheets (als webhook ingesteld is)
-            if (CONFIG.googleSheetsWebhook && CONFIG.googleSheetsWebhook !== 'JOUW_GOOGLE_SHEETS_WEBHOOK_URL_HIER') {
-                try {
-                    await fetch(CONFIG.googleSheetsWebhook, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(data)
-                    });
-                } catch (error) {
-                    console.log('Google Sheets sync (no-cors mode)');
-                }
-            }
+            // 1) Open WhatsApp DIRECT (belangrijk voor mobiel)
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+if (isMobile) {
+  window.location.href = whatsappUrl;   // mobiel: geen popup-block
+} else {
+  window.open(whatsappUrl, '_blank');   // pc: nieuwe tab oké
+}
 
-            // 3. Open WhatsApp
-            window.open(whatsappUrl, '_blank');
+// 2) Stuur naar Google Sheets (niet blokkeren met await)
+if (CONFIG.googleSheetsWebhook && CONFIG.googleSheetsWebhook !== 'JOUW_GOOGLE_SHEETS_WEBHOOK_URL_HIER') {
+  fetch(CONFIG.googleSheetsWebhook, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(data)
+  }).catch(() => {});
+}
+
 
             // Toon success bericht
             setTimeout(() => {
