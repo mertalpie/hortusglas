@@ -537,11 +537,12 @@
         const PRICE_PER_METER_HELDER = 160;
         const PRICE_PER_METER_GETINT = 170;
         
-        const EXTRAS = {
-            tochtstrip: 50,
-            deurgreep: 35,
-            steellook: 75,
-            funderingsbalk: 120
+        // Basis prijzen per accessoire (worden vermenigvuldigd met aantal panelen)
+        const EXTRAS_PER_PANEL = {
+            tochtstrip: 15,      // €15 per paneel
+            deurgreep: 35,       // €35 vast (1x)
+            steellook: 25,       // €25 per paneel
+            funderingsbalk: 40   // €40 per meter (afgerond)
         };
 
         // Rail systeem bepalen op basis van breedte
@@ -587,12 +588,39 @@
             const pricePerMeter = glassType === 'helder' ? PRICE_PER_METER_HELDER : PRICE_PER_METER_GETINT;
             const basePrice = widthInMeters * pricePerMeter;
 
-            // Extra opties berekenen
+            // Extra opties berekenen - DYNAMISCH op basis van aantal panelen
             const checkboxes = document.querySelectorAll('input[name="options"]:checked');
             let extrasPrice = 0;
+            let extrasDetails = [];
+            
             checkboxes.forEach(checkbox => {
-                extrasPrice += EXTRAS[checkbox.value];
+                const option = checkbox.value;
+                let optionPrice = 0;
+                
+                if (option === 'tochtstrip') {
+                    // Tochtstrip: per paneel (aantal rails = aantal panelen)
+                    optionPrice = EXTRAS_PER_PANEL.tochtstrip * railSystem.rails;
+                    extrasDetails.push(`Tochtstrip (${railSystem.rails}x): €${optionPrice}`);
+                } else if (option === 'deurgreep') {
+                    // Deurgreep: vast bedrag (1x)
+                    optionPrice = EXTRAS_PER_PANEL.deurgreep;
+                    extrasDetails.push(`Deurgreep: €${optionPrice}`);
+                } else if (option === 'steellook') {
+                    // Steel Look: per paneel
+                    optionPrice = EXTRAS_PER_PANEL.steellook * railSystem.rails;
+                    extrasDetails.push(`Steel Look (${railSystem.rails}x): €${optionPrice}`);
+                } else if (option === 'funderingsbalk') {
+                    // Funderingsbalk: per meter (afgerond naar boven)
+                    const meters = Math.ceil(widthInMeters);
+                    optionPrice = EXTRAS_PER_PANEL.funderingsbalk * meters;
+                    extrasDetails.push(`Funderingsbalk (${meters}m): €${optionPrice}`);
+                }
+                
+                extrasPrice += optionPrice;
             });
+
+            // Update checkbox labels met dynamische prijzen
+            updateCheckboxLabels(railSystem, widthInMeters);
 
             // Weergave updaten
             document.getElementById('base-price').textContent = '€' + basePrice.toFixed(2).replace('.', ',');
@@ -606,6 +634,20 @@
 
             const totalPrice = basePrice + extrasPrice;
             document.getElementById('total-price').textContent = '€' + totalPrice.toFixed(2).replace('.', ',');
+        }
+
+        // Update checkbox labels met actuele prijzen
+        function updateCheckboxLabels(railSystem, widthInMeters) {
+            if (!railSystem) return;
+            
+            const tochtPrice = EXTRAS_PER_PANEL.tochtstrip * railSystem.rails;
+            const steelPrice = EXTRAS_PER_PANEL.steellook * railSystem.rails;
+            const funderingPrice = EXTRAS_PER_PANEL.funderingsbalk * Math.ceil(widthInMeters);
+            
+            document.querySelector('label[for="tochtstrip"]').innerHTML = `🌬️ Tochtstrip (+€${tochtPrice})`;
+            document.querySelector('label[for="deurgreep"]').innerHTML = `🔘 Deurgreep (+€${EXTRAS_PER_PANEL.deurgreep})`;
+            document.querySelector('label[for="steellook"]').innerHTML = `🏭 Steel Look (+€${steelPrice})`;
+            document.querySelector('label[for="funderingsbalk"]').innerHTML = `🔨 Funderingsbalk (+€${funderingPrice})`;
         }
 
         // WhatsApp bestelling
@@ -623,18 +665,35 @@
             const railSystem = determineRailSystem(width);
             const glassTypeText = glassType === 'helder' ? 'Helder Glas' : 'Getint Glas';
             const colorText = color.charAt(0).toUpperCase() + color.slice(1);
+            const widthInMeters = width / 100;
 
-            // Extra opties verzamelen
+            // Extra opties verzamelen met prijzen
             const checkboxes = document.querySelectorAll('input[name="options"]:checked');
             let extras = [];
+            let extrasTotal = 0;
+            
             checkboxes.forEach(checkbox => {
-                const labels = {
-                    tochtstrip: 'Tochtstrip',
-                    deurgreep: 'Deurgreep',
-                    steellook: 'Steel Look',
-                    funderingsbalk: 'Funderingsbalk'
-                };
-                extras.push(labels[checkbox.value]);
+                const option = checkbox.value;
+                let price = 0;
+                let label = '';
+                
+                if (option === 'tochtstrip') {
+                    price = EXTRAS_PER_PANEL.tochtstrip * railSystem.rails;
+                    label = `Tochtstrip (${railSystem.rails} panelen): €${price}`;
+                } else if (option === 'deurgreep') {
+                    price = EXTRAS_PER_PANEL.deurgreep;
+                    label = `Deurgreep: €${price}`;
+                } else if (option === 'steellook') {
+                    price = EXTRAS_PER_PANEL.steellook * railSystem.rails;
+                    label = `Steel Look (${railSystem.rails} panelen): €${price}`;
+                } else if (option === 'funderingsbalk') {
+                    const meters = Math.ceil(widthInMeters);
+                    price = EXTRAS_PER_PANEL.funderingsbalk * meters;
+                    label = `Funderingsbalk (${meters}m): €${price}`;
+                }
+                
+                extras.push(label);
+                extrasTotal += price;
             });
 
             const totalPrice = document.getElementById('total-price').textContent;
@@ -642,9 +701,9 @@
             // WhatsApp bericht samenstellen
             let message = `🌿 *NIEUWE BESTELLING - HortusGlas*\n\n`;
             message += `📏 *Afmetingen:*\n`;
-            message += `• Breedte: ${width} cm\n`;
+            message += `• Breedte: ${width} cm (${widthInMeters.toFixed(1)}m)\n`;
             message += `• Hoogte: ${height} cm\n`;
-            message += `• Systeem: ${railSystem.name}\n\n`;
+            message += `• Systeem: ${railSystem.name} (${railSystem.rails} panelen)\n\n`;
             message += `🪟 *Specificaties:*\n`;
             message += `• Glastype: ${glassTypeText}\n`;
             message += `• Kleur rails: ${colorText}\n\n`;
@@ -657,10 +716,10 @@
                 message += `\n`;
             }
             
-            message += `💰 *Totaalprijs: ${totalPrice}*\n\n`;
+            message += `💰 *Totaalprijs: ${totalPrice}* (incl. BTW)\n\n`;
             message += `Ik wil graag een offerte of meer informatie ontvangen.`;
 
-            // VERVANG DIT NUMMER MET JOUW WHATSAPP BUSINESS NUMMER
+            // VERVANG DIT NUMMER MET JOUW WHATSAPP NUMMER
             const phoneNumber = '31611213411'; // Formaat: landcode + nummer zonder + of 0
             const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
             
