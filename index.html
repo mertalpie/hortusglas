@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glazen Schuifwand Configurator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .price-banner {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        .price-banner h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .price-banner ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .price-banner li {
+            font-size: 1.1em;
+        }
+
+        .price-banner li:before {
+            content: "✓ ";
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .color-option {
+            position: relative;
+            padding: 15px;
+            border: 3px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .color-option:hover {
+            border-color: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        .color-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .color-option input[type="radio"]:checked + .color-display {
+            border: 3px solid #667eea;
+        }
+
+        .color-display {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            border: 3px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .color-antraciet { background: #2d3748; }
+        .color-creme { background: #f7fafc; border: 2px solid #cbd5e0 !important; }
+        .color-wit { background: #ffffff; border: 2px solid #cbd5e0 !important; }
+        .color-zwart { background: #000000; }
+
+        .rails-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .rails-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .rail-option {
+            position: relative;
+            padding: 20px 15px;
+            border: 3px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        }
+
+        .rail-option:hover {
+            border-color: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        .rail-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .rail-option input[type="radio"]:checked + label {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .rail-option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+        }
+
+        .rail-option .rail-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .rail-option .rail-label {
+            font-size: 0.9em;
+            color: #718096;
+        }
+
+        .dimensions-section {
+            background: #f7fafc;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .dimensions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .price-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .price-section h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .price-display {
+            font-size: 3.5em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .price-breakdown {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .price-item:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.6);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        .info-box {
+            background: #edf2f7;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-box h4 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .info-box p {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .success-message {
+            background: #48bb78;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 Glazen Schuifwand Configurator</h1>
+        <p class="subtitle">Stel je perfecte schuifwand samen in 3 eenvoudige stappen</p>
+
+        <div class="price-banner">
+            <h2>Voordelen van onze schuifwanden</h2>
+            <ul>
+                <li>Helder glas €160 per meter</li>
+                <li>Getint glas €170 per meter</li>
+                <li>Binnen 10 werkdagen GRATIS bezorgd!</li>
+                <li>Goedkoopste van heel Nederland!</li>
+            </ul>
+        </div>
+
+        <form id="configuratorForm">
+            <!-- STAP 1: Aantal Rails -->
+            <div class="form-group">
+                <label>Stap 1: Kies aantal rails (breedte schuifwand)</label>
+                <div class="rails-grid">
+                    <div class="rail-option" onclick="selectRail(3)">
+                        <input type="radio" name="rails" value="3" id="rail3" required>
+                        <label for="rail3">
+                            <div class="rail-number">3</div>
+                            <div class="rail-label">Rails</div>
+                            <div class="rail-label">tot 3m</div>
+                        </label>
+                    </div>
+                    <div class="rail-option" onclick="selectRail(4)">
+                        <input type="radio" name="rails" value="4" id="rail4">
+                        <label for="rail4">
+                            <div class="rail-number">4</div>
+                            <div class="rail-label">Rails</div>
+                            <div class="rail-label">tot 4m</div>
+                        </label>
+                    </div>
+                    <div class="rail-option" onclick="selectRail(5)">
+                        <input type="radio" name="rails" value="5" id="rail5">
+                        <label for="rail5">
+                            <div class="rail-number">5</div>
+                            <div class="rail-label">Rails</div>
+                            <div class="rail-label">tot 5m</div>
+                        </label>
+                    </div>
+                    <div class="rail-option" onclick="selectRail(6)">
+                        <input type="radio" name="rails" value="6" id="rail6">
+                        <label for="rail6">
+                            <div class="rail-number">6</div>
+                            <div class="rail-label">Rails</div>
+                            <div class="rail-label">tot 6m</div>
+                        </label>
+                    </div>
+                    <div class="rail-option" onclick="selectRail(7)">
+                        <input type="radio" name="rails" value="7" id="rail7">
+                        <label for="rail7">
+                            <div class="rail-number">7</div>
+                            <div class="rail-label">Rails</div>
+                            <div class="rail-label">tot 7m</div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STAP 2: Afmetingen -->
+            <div class="dimensions-section">
+                <label>Stap 2: Voer afmetingen in</label>
+                <div class="info-box">
+                    <h4>📏 Hoe meet je correct?</h4>
+                    <p>Meet de <strong>breedte</strong> tussen de twee palen of muren op 3 hoogtes (boven, midden, onder) en noteer de <strong>kleinste maat</strong>.</p>
+                    <p>Meet de <strong>hoogte</strong> op 3 punten (links, midden, rechts) en noteer de <strong>kleinste maat</strong>.</p>
+                </div>
+                <div class="dimensions-grid">
+                    <div class="form-group">
+                        <label>Breedte (mm) *</label>
+                        <input type="number" id="width" name="width" min="1640" max="7300" placeholder="Bijv. 3000" required oninput="calculatePrice()">
+                        <small style="color: #718096; display: block; margin-top: 5px;">Minimum 1640mm, Maximum 7300mm</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Hoogte (mm) *</label>
+                        <select id="height" name="height" required onchange="calculatePrice()">
+                            <option value="">Selecteer hoogte</option>
+                            <option value="2050">2050 mm (Werkhoogte 205 cm)</option>
+                            <option value="2150">2150 mm (Werkhoogte 215 cm)</option>
+                            <option value="2250">2250 mm (Werkhoogte 225 cm)</option>
+                            <option value="2350">2350 mm (Werkhoogte 235 cm)</option>
+                            <option value="2450">2450 mm (Werkhoogte 245 cm)</option>
+                            <option value="2550">2550 mm (Werkhoogte 255 cm)</option>
+                            <option value="2650">2650 mm (Werkhoogte 265 cm)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STAP 3: Glastype en Kleur -->
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Stap 3a: Kies glastype *</label>
+                    <select id="glassType" name="glassType" required onchange="calculatePrice()">
+                        <option value="">Selecteer glastype</option>
+                        <option value="helder">Helder Glas (10mm gehard) - €160/m</option>
+                        <option value="getint">Getint Glas (10mm gehard) - €170/m</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Stap 3b: Kies kleur rails *</label>
+                    <div class="color-grid">
+                        <label class="color-option">
+                            <input type="radio" name="color" value="antraciet" required onchange="calculatePrice()">
+                            <div class="color-display color-antraciet"></div>
+                            <span>Antraciet</span>
+                        </label>
+                        <label class="color-option">
+                            <input type="radio" name="color" value="creme" onchange="calculatePrice()">
+                            <div class="color-display color-creme"></div>
+                            <span>Creme</span>
+                        </label>
+                        <label class="color-option">
+                            <input type="radio" name="color" value="wit" onchange="calculatePrice()">
+                            <div class="color-display color-wit"></div>
+                            <span>Wit</span>
+                        </label>
+                        <label class="color-option">
+                            <input type="radio" name="color" value="zwart" onchange="calculatePrice()">
+                            <div class="color-display color-zwart"></div>
+                            <span>Zwart</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prijsweergave -->
+            <div class="price-section" id="priceSection" style="display: none;">
+                <h3>💰 Jouw Totaalprijs</h3>
+                <div class="price-display" id="totalPrice">€ 0,00</div>
+                <div class="price-breakdown">
+                    <div class="price-item">
+                        <span>Basisprijs schuifwand:</span>
+                        <span id="basePrice">€ 0,00</span>
+                    </div>
+                    <div class="price-item">
+                        <span>Gratis bezorging:</span>
+                        <span>€ 0,00</span>
+                    </div>
+                    <div class="price-item">
+                        <span>Totaal (incl. BTW):</span>
+                        <span id="finalPrice">€ 0,00</span>
+                    </div>
+                </div>
+                <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.9;">✓ Binnen 10 werkdagen geleverd!</p>
+            </div>
+
+            <!-- Klantgegevens -->
+            <h3 style="margin: 40px 0 20px 0; color: #2d3748;">📝 Jouw Gegevens</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Naam *</label>
+                    <input type="text" name="name" required placeholder="Voor- en achternaam">
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" name="email" required placeholder="jouw@email.nl">
+                </div>
+                <div class="form-group">
+                    <label>Telefoon *</label>
+                    <input type="tel" name="phone" required placeholder="06 12345678">
+                </div>
+                <div class="form-group">
+                    <label>Postcode *</label>
+                    <input type="text" name="zipcode" required placeholder="1234 AB">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Adres *</label>
+                <input type="text" name="address" required placeholder="Straatnaam 123, Plaatsnaam">
+            </div>
+            <div class="form-group">
+                <label>Opmerkingen (optioneel)</label>
+                <textarea name="comments" rows="4" placeholder="Eventuele extra wensen of vragen..."></textarea>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Bestelling wordt verwerkt...</p>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                <h3>✅ Bestelling Ontvangen!</h3>
+                <p>Bedankt! We hebben je configuratie ontvangen via WhatsApp en Google Sheets.</p>
+                <p>Je ontvangt binnen 24 uur een betaalverzoek en factuur.</p>
+            </div>
+
+            <button type="submit" class="submit-button">
+                📱 Offerte aanvragen via WhatsApp
+            </button>
+        </form>
+
+        <div class="info-box" style="margin-top: 30px;">
+            <h4>🎯 Hoe werkt het?</h4>
+            <p><strong>1.</strong> Configureer je schuifwand → <strong>2.</strong> Vul je gegevens in → <strong>3.</strong> Ontvang betaalverzoek → <strong>4.</strong> Na betaling wordt je order bij de leverancier geplaatst → <strong>5.</strong> Binnen 10 werkdagen geleverd!</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuratie - PAS DEZE AAN MET JOUW GEGEVENS
+        const CONFIG = {
+            whatsappNumber: '31683968325', // Vervang met jouw WhatsApp Business nummer (zonder + en spaties)
+            googleSheetsWebhook: 'https://script.google.com/macros/s/AKfycbxYHplyUrzgxIUffIGdlYTYPDop412E5SkvImlVlj0AWVSTAB7JatGilIf3PR5wvelT/exec', // Komt later
+            pricePerMeterHelder: 160,
+            pricePerMeterGetint: 170
+        };
+
+        let selectedRails = null;
+
+        function selectRail(rails) {
+            selectedRails = rails;
+            // Verwijder selected class van alle opties
+            document.querySelectorAll('.rail-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            // Voeg selected class toe aan gekozen optie
+            event.currentTarget.classList.add('selected');
+            
+            // Check de radio button
+            document.getElementById('rail' + rails).checked = true;
+            
+            calculatePrice();
+        }
+
+        function calculatePrice() {
+            const width = document.getElementById('width').value;
+            const height = document.getElementById('height').value;
+            const glassType = document.getElementById('glassType').value;
+            const rails = document.querySelector('input[name="rails"]:checked')?.value;
+
+            if (width && height && glassType && rails) {
+                const widthMeters = width / 1000;
+                const pricePerMeter = glassType === 'helder' ? CONFIG.pricePerMeterHelder : CONFIG.pricePerMeterGetint;
+                const basePrice = widthMeters * pricePerMeter;
+                
+                // Toon prijsectie
+                document.getElementById('priceSection').style.display = 'block';
+                document.getElementById('basePrice').textContent = '€ ' + basePrice.toFixed(2);
+                document.getElementById('totalPrice').textContent = '€ ' + basePrice.toFixed(2);
+                document.getElementById('finalPrice').textContent = '€ ' + basePrice.toFixed(2);
+            }
+        }
+
+        document.getElementById('configuratorForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Verzamel alle gegevens
+            const formData = new FormData(e.target);
+            const data = {
+                rails: formData.get('rails'),
+                width: formData.get('width'),
+                height: formData.get('height'),
+                glassType: formData.get('glassType'),
+                color: formData.get('color'),
+                name: formData.get('name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                zipcode: formData.get('zipcode'),
+                address: formData.get('address'),
+                comments: formData.get('comments'),
+                totalPrice: document.getElementById('totalPrice').textContent,
+                timestamp: new Date().toLocaleString('nl-NL')
+            };
+
+            // Toon loading
+            document.getElementById('loading').style.display = 'block';
+            document.querySelector('.submit-button').style.display = 'none';
+
+            // 1. Stuur naar WhatsApp
+            const whatsappMessage = `
+🏠 *NIEUWE BESTELLING - GLAZEN SCHUIFWAND*
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 *CONFIGURATIE:*
+• Aantal rails: ${data.rails} rails
+• Breedte: ${data.width} mm
+• Hoogte: ${data.height} mm
+• Glastype: ${data.glassType === 'helder' ? 'Helder Glas' : 'Getint Glas'}
+• Kleur rails: ${data.color.charAt(0).toUpperCase() + data.color.slice(1)}
+
+💰 *PRIJS:*
+${data.totalPrice} (incl. BTW)
+
+👤 *KLANTGEGEVENS:*
+• Naam: ${data.name}
+• Email: ${data.email}
+• Telefoon: ${data.phone}
+• Postcode: ${data.zipcode}
+• Adres: ${data.address}
+
+📝 *Opmerkingen:*
+${data.comments || 'Geen opmerkingen'}
+
+🕐 *Datum/tijd:* ${data.timestamp}
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+            `.trim();
+
+            const whatsappUrl = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+            
+            // 2. Stuur naar Google Sheets (als webhook ingesteld is)
+            if (CONFIG.googleSheetsWebhook && CONFIG.googleSheetsWebhook !== 'JOUW_GOOGLE_SHEETS_WEBHOOK_URL_HIER') {
+                try {
+                    await fetch(CONFIG.googleSheetsWebhook, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
+                } catch (error) {
+                    console.log('Google Sheets sync (no-cors mode)');
+                }
+            }
+
+            // 3. Open WhatsApp
+            window.open(whatsappUrl, '_blank');
+
+            // Toon success bericht
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+                
+                // Reset form na 3 seconden
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
