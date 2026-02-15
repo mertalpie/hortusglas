@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HortusGlas - Glazen Schuifwand Configurator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0A4D3C;
+            --primary-light: #0F6B50;
+            --accent: #D4AF37;
+            --bg: #F8F9FA;
+            --white: #FFFFFF;
+            --text: #1A1A1A;
+            --text-light: #6B7280;
+            --border: #E5E7EB;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #F8F9FA 0%, #E8EEF2 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .configurator-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px var(--shadow);
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .step {
+            margin-bottom: 35px;
+            padding-bottom: 35px;
+            border-bottom: 2px solid var(--border);
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .step:last-child {
+            border-bottom: none;
+        }
+
+        .step:nth-child(1) { animation-delay: 0.3s; }
+        .step:nth-child(2) { animation-delay: 0.4s; }
+        .step:nth-child(3) { animation-delay: 0.5s; }
+        .step:nth-child(4) { animation-delay: 0.6s; }
+        .step:nth-child(5) { animation-delay: 0.7s; }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(10, 77, 60, 0.1);
+        }
+
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .radio-option {
+            position: relative;
+        }
+
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .radio-label {
+            display: block;
+            padding: 16px 20px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            background: var(--white);
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-label {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(10, 77, 60, 0.3);
+        }
+
+        .radio-label:hover {
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .checkbox-option {
+            position: relative;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            background: var(--white);
+        }
+
+        .checkbox-label::before {
+            content: '';
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            margin-right: 12px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .checkbox-option input[type="checkbox"]:checked + .checkbox-label {
+            border-color: var(--primary);
+            background: rgba(10, 77, 60, 0.05);
+        }
+
+        .checkbox-option input[type="checkbox"]:checked + .checkbox-label::before {
+            background: var(--primary);
+            border-color: var(--primary);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='M13.5 3L6 10.5 2.5 7'/%3E%3C/svg%3E");
+            background-size: 14px;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(10, 77, 60, 0.05) 0%, rgba(15, 107, 80, 0.05) 100%);
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+
+        .info-box strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .price-summary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            margin-top: 35px;
+            animation: fadeInUp 0.6s ease 0.8s both;
+        }
+
+        .price-summary h3 {
+            font-family: 'Fraunces', serif;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .price-breakdown {
+            margin-bottom: 20px;
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.95rem;
+        }
+
+        .price-item:last-child {
+            border-bottom: none;
+        }
+
+        .total-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .total-price .label {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .total-price .amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            font-family: 'Fraunces', serif;
+        }
+
+        .cta-button {
+            width: 100%;
+            padding: 18px 30px;
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(212, 175, 55, 0.4);
+        }
+
+        .cta-button:active {
+            transform: translateY(0);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            animation: fadeIn 1s ease 1s both;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .configurator-card {
+                padding: 25px;
+            }
+
+            .radio-group,
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+
+            .total-price .amount {
+                font-size: 1.8rem;
+            }
+        }
+
+        .error-message {
+            color: #DC2626;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌿 HortusGlas</h1>
+            <p class="tagline">Stel je perfecte glazen schuifwand samen in 5 stappen</p>
+        </header>
+
+        <div class="configurator-card">
+            <form id="configurator">
+                <!-- Step 1: Breedte -->
+                <div class="step">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <h2 class="step-title">Breedte van je schuifwand</h2>
+                    </div>
+                    <div class="input-group">
+                        <label for="width">Breedte in centimeters (140 - 705 cm)</label>
+                        <input type="number" id="width" name="width" min="140" max="705" placeholder="Bijv. 300" required>
+                        <div class="error-message" id="width-error">Vul een breedte in tussen 140 en 705 cm</div>
+                    </div>
+                    <div class="info-box" id="rail-info" style="display: none;">
+                        <strong>📏 Aanbevolen systeem:</strong>
+                        <span id="rail-recommendation"></span>
+                    </div>
+                </div>
+
+                <!-- Step 2: Hoogte -->
+                <div class="step">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h2 class="step-title">Hoogte van je schuifwand</h2>
+                    </div>
+                    <div class="input-group">
+                        <label for="height">Hoogte in centimeters (199 - 262 cm)</label>
+                        <input type="number" id="height" name="height" min="199" max="262" placeholder="Bijv. 220" required>
+                        <div class="error-message" id="height-error">Vul een hoogte in tussen 199 en 262 cm</div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Glastype -->
+                <div class="step">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <h2 class="step-title">Type glas</h2>
+                    </div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="helder" name="glass" value="helder" checked>
+                            <label for="helder" class="radio-label">💎 Helder Glas</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="getint" name="glass" value="getint">
+                            <label for="getint" class="radio-label">🌫️ Getint Glas</label>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <strong>ℹ️ Info:</strong>
+                        Helder glas: €160/meter | Getint glas: €170/meter (extra privacy & UV-bescherming)
+                    </div>
+                </div>
+
+                <!-- Step 4: Kleur Rails -->
+                <div class="step">
+                    <div class="step-header">
+                        <div class="step-number">4</div>
+                        <h2 class="step-title">Kleur van de rails</h2>
+                    </div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="antraciet" name="color" value="antraciet" checked>
+                            <label for="antraciet" class="radio-label">⬛ Antraciet</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="wit" name="color" value="wit">
+                            <label for="wit" class="radio-label">⬜ Wit</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="zwart" name="color" value="zwart">
+                            <label for="zwart" class="radio-label">⬛ Zwart</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Extra opties -->
+                <div class="step">
+                    <div class="step-header">
+                        <div class="step-number">5</div>
+                        <h2 class="step-title">Extra opties</h2>
+                    </div>
+                    <div class="checkbox-group">
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="tochtstrip" name="options" value="tochtstrip">
+                            <label for="tochtstrip" class="checkbox-label">🌬️ Tochtstrip (+€50)</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="deurgreep" name="options" value="deurgreep">
+                            <label for="deurgreep" class="checkbox-label">🔘 Deurgreep (+€35)</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="steellook" name="options" value="steellook">
+                            <label for="steellook" class="checkbox-label">🏭 Steel Look (+€75)</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="funderingsbalk" name="options" value="funderingsbalk">
+                            <label for="funderingsbalk" class="checkbox-label">🔨 Funderingsbalk (+€120)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Summary -->
+                <div class="price-summary">
+                    <h3>📋 Jouw Samenstelling</h3>
+                    <div class="price-breakdown" id="breakdown">
+                        <div class="price-item">
+                            <span>Basis schuifwand</span>
+                            <span id="base-price">€0,00</span>
+                        </div>
+                        <div class="price-item" id="extras-line" style="display: none;">
+                            <span>Extra opties</span>
+                            <span id="extras-price">€0,00</span>
+                        </div>
+                    </div>
+                    <div class="total-price">
+                        <span class="label">Totaalprijs</span>
+                        <span class="amount" id="total-price">€0,00</span>
+                    </div>
+                    <button type="button" class="cta-button" onclick="orderViaWhatsApp()">
+                        📱 Bestel via WhatsApp
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <footer>
+            <p>© 2026 HortusGlas | Glazen Schuifwanden op Maat</p>
+            <p style="margin-top: 8px; font-size: 0.85rem;">Gratis levering • 5 jaar garantie • Binnen 10 werkdagen geleverd</p>
+        </footer>
+    </div>
+
+    <script>
+        // Prijzen configuratie (gebaseerd op schuifwandfabriek.nl)
+        const PRICE_PER_METER_HELDER = 160;
+        const PRICE_PER_METER_GETINT = 170;
+        
+        const EXTRAS = {
+            tochtstrip: 50,
+            deurgreep: 35,
+            steellook: 75,
+            funderingsbalk: 120
+        };
+
+        // Rail systeem bepalen op basis van breedte
+        function determineRailSystem(width) {
+            if (width >= 140 && width <= 204) return { rails: 2, name: '2-Rails Systeem' };
+            if (width >= 205 && width <= 305) return { rails: 3, name: '3-Rails Systeem' };
+            if (width >= 306 && width <= 405) return { rails: 4, name: '4-Rails Systeem' };
+            if (width >= 406 && width <= 505) return { rails: 5, name: '5-Rails Systeem' };
+            if (width >= 506 && width <= 605) return { rails: 6, name: '6-Rails Systeem' };
+            if (width >= 606 && width <= 705) return { rails: 7, name: '7-Rails Systeem' };
+            return null;
+        }
+
+        // Prijs berekenen
+        function calculatePrice() {
+            const width = parseInt(document.getElementById('width').value);
+            const height = parseInt(document.getElementById('height').value);
+            const glassType = document.querySelector('input[name="glass"]:checked').value;
+            
+            if (!width || width < 140 || width > 705) {
+                document.getElementById('width-error').classList.add('show');
+                return;
+            } else {
+                document.getElementById('width-error').classList.remove('show');
+            }
+
+            if (!height || height < 199 || height > 262) {
+                document.getElementById('height-error').classList.add('show');
+                return;
+            } else {
+                document.getElementById('height-error').classList.remove('show');
+            }
+
+            // Rail systeem tonen
+            const railSystem = determineRailSystem(width);
+            if (railSystem) {
+                document.getElementById('rail-info').style.display = 'block';
+                document.getElementById('rail-recommendation').textContent = railSystem.name + ' - Ideaal voor ' + width + 'cm breedte';
+            }
+
+            // Basis prijs berekenen
+            const widthInMeters = width / 100;
+            const pricePerMeter = glassType === 'helder' ? PRICE_PER_METER_HELDER : PRICE_PER_METER_GETINT;
+            const basePrice = widthInMeters * pricePerMeter;
+
+            // Extra opties berekenen
+            const checkboxes = document.querySelectorAll('input[name="options"]:checked');
+            let extrasPrice = 0;
+            checkboxes.forEach(checkbox => {
+                extrasPrice += EXTRAS[checkbox.value];
+            });
+
+            // Weergave updaten
+            document.getElementById('base-price').textContent = '€' + basePrice.toFixed(2).replace('.', ',');
+            
+            if (extrasPrice > 0) {
+                document.getElementById('extras-line').style.display = 'flex';
+                document.getElementById('extras-price').textContent = '€' + extrasPrice.toFixed(2).replace('.', ',');
+            } else {
+                document.getElementById('extras-line').style.display = 'none';
+            }
+
+            const totalPrice = basePrice + extrasPrice;
+            document.getElementById('total-price').textContent = '€' + totalPrice.toFixed(2).replace('.', ',');
+        }
+
+        // WhatsApp bestelling
+        function orderViaWhatsApp() {
+            const width = parseInt(document.getElementById('width').value);
+            const height = parseInt(document.getElementById('height').value);
+            const glassType = document.querySelector('input[name="glass"]:checked').value;
+            const color = document.querySelector('input[name="color"]:checked').value;
+            
+            if (!width || !height) {
+                alert('Vul eerst alle vereiste velden in');
+                return;
+            }
+
+            const railSystem = determineRailSystem(width);
+            const glassTypeText = glassType === 'helder' ? 'Helder Glas' : 'Getint Glas';
+            const colorText = color.charAt(0).toUpperCase() + color.slice(1);
+
+            // Extra opties verzamelen
+            const checkboxes = document.querySelectorAll('input[name="options"]:checked');
+            let extras = [];
+            checkboxes.forEach(checkbox => {
+                const labels = {
+                    tochtstrip: 'Tochtstrip',
+                    deurgreep: 'Deurgreep',
+                    steellook: 'Steel Look',
+                    funderingsbalk: 'Funderingsbalk'
+                };
+                extras.push(labels[checkbox.value]);
+            });
+
+            const totalPrice = document.getElementById('total-price').textContent;
+
+            // WhatsApp bericht samenstellen
+            let message = `🌿 *NIEUWE BESTELLING - HortusGlas*\n\n`;
+            message += `📏 *Afmetingen:*\n`;
+            message += `• Breedte: ${width} cm\n`;
+            message += `• Hoogte: ${height} cm\n`;
+            message += `• Systeem: ${railSystem.name}\n\n`;
+            message += `🪟 *Specificaties:*\n`;
+            message += `• Glastype: ${glassTypeText}\n`;
+            message += `• Kleur rails: ${colorText}\n\n`;
+            
+            if (extras.length > 0) {
+                message += `✨ *Extra opties:*\n`;
+                extras.forEach(extra => {
+                    message += `• ${extra}\n`;
+                });
+                message += `\n`;
+            }
+            
+            message += `💰 *Totaalprijs: ${totalPrice}*\n\n`;
+            message += `Ik wil graag een offerte of meer informatie ontvangen.`;
+
+            // VERVANG DIT NUMMER MET JOUW WHATSAPP BUSINESS NUMMER
+            const phoneNumber = '31611213411'; // Formaat: landcode + nummer zonder + of 0
+            const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            
+            window.open(whatsappURL, '_blank');
+        }
+
+        // Event listeners
+        document.getElementById('width').addEventListener('input', calculatePrice);
+        document.getElementById('height').addEventListener('input', calculatePrice);
+        document.querySelectorAll('input[name="glass"]').forEach(radio => {
+            radio.addEventListener('change', calculatePrice);
+        });
+        document.querySelectorAll('input[name="options"]').forEach(checkbox => {
+            checkbox.addEventListener('change', calculatePrice);
+        });
+
+        // Initiële berekening
+        calculatePrice();
+    </script>
+</body>
+</html>
